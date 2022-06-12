@@ -6,9 +6,12 @@ elseif exists('b:current_syntax')
   finish
 endif
 
-" Keep user-supplied options
+" Keep user-supplied options, default all to true
 if !exists('nim_highlight_numbers')
   let nim_highlight_numbers = 1
+endif
+if !exists('nim_highlight_some_types')
+  let nim_highlight_some_types = 1
 endif
 if !exists('nim_highlight_builtins')
   let nim_highlight_builtins = 1
@@ -36,29 +39,30 @@ syn region nimBrackets       contained extend keepend matchgroup=Bold start=+\(\
 syn keyword nimKeyword       addr and as asm atomic
 syn keyword nimKeyword       bind block break
 syn keyword nimKeyword       case cast concept const continue converter
-syn keyword nimKeyword       defer discard distinct div do
-syn keyword nimKeyword       elif else end enum except export
+syn keyword nimKeyword       defer discard distinct div
+syn keyword nimKeyword       end enum except export
 syn keyword nimKeyword       finally for from
 syn keyword nimKeyword       generic
-syn keyword nimKeyword       if import in include interface is isnot iterator
+syn keyword nimKeyword       in is isnot
 syn keyword nimKeyword       let
 syn keyword nimKeyword       mixin using mod
 syn keyword nimKeyword       nil not notin
 syn keyword nimKeyword       object of or out
-syn keyword nimKeyword       proc func method macro template nextgroup=nimFunction skipwhite
 syn keyword nimKeyword       ptr
 syn keyword nimKeyword       raise ref return
 syn keyword nimKeyword       shared shl shr static
 syn keyword nimKeyword       try tuple type
 syn keyword nimKeyword       var vtref vtptr
-syn keyword nimKeyword       when while with without
+syn keyword nimKeyword       with without
 syn keyword nimKeyword       xor
 syn keyword nimKeyword       yield
 
-syn match   nimFunction      "[a-zA-Z_][a-zA-Z0-9_]*" contained
+syn keyword nimLibrary       import include interface
+syn keyword nimFunction       proc func method macro template iterator nextgroup=nimFunctionName skipwhite
+syn match   nimFunctionName      "[a-zA-Z_][a-zA-Z0-9_]*" contained
 syn match   nimClass         "[a-zA-Z_][a-zA-Z0-9_]*" contained
-syn keyword nimRepeat        for while
-syn keyword nimConditional   if elif else case of
+syn keyword nimRepeat        for while do
+syn keyword nimConditional   if elif else case of when
 syn keyword nimOperator      and in is not or xor shl shr div
 
 syn match   nimComment       "#.*$" contains=nimTodo,@Spell
@@ -99,13 +103,15 @@ if nim_highlight_numbers == 1
   unlet s:dec_num s:int_suf s:float_suf s:exp
 endif
 
+if nim_highlight_some_types == 1
+  syn keyword nimType byte int int8 int16 int32 int64 uint uint8 uint16 uint32 uint64 float float32 float64
+  syn keyword nimType bool void chr char string cstring cstringArray pointer range array openarray openArray seq varargs varArgs
+  syn keyword nimType set Byte Natural Positive Conversion
+  syn keyword nimType BiggestInt BiggestFloat BiggestUInt cchar cschar cshort cint csize csize_t cuchar cushort
+  syn keyword nimType clong clonglong cfloat cdouble clongdouble cuint culong culonglong cchar
+endif
+
 if nim_highlight_builtins == 1
-  " builtin functions, types and objects, not really part of the syntax
-  syn keyword nimBuiltin byte int int8 int16 int32 int64 uint uint8 uint16 uint32 uint64 float float32 float64
-  syn keyword nimBuiltin bool void chr char string cstring cstringArray pointer range array openarray openArray seq varargs varArgs
-  syn keyword nimBuiltin set Byte Natural Positive Conversion
-  syn keyword nimBuiltin BiggestInt BiggestFloat BiggestUInt cchar cschar cshort cint csize csize_t cuchar cushort
-  syn keyword nimBuiltin clong clonglong cfloat cdouble clongdouble cuint culong culonglong cchar
   syn keyword nimBuiltin CompileDate CompileTime nimversion nimVersion nimmajor nimMajor
   syn keyword nimBuiltin nimminor nimMinor nimpatch nimPatch cpuendian cpuEndian hostos hostOS hostcpu hostCPU inf
   syn keyword nimBuiltin neginf nan QuitSuccess QuitFailure dbglinehook dbgLineHook stdin
@@ -172,35 +178,41 @@ if v:version >= 508 || !exists('did_nim_syn_inits')
 
   " The default methods for highlighting.  Can be overridden later
   HiLink nimBrackets       Operator
-  HiLink nimKeyword	      Keyword
-  HiLink nimFunction	    	Function
-  HiLink nimConditional	  Conditional
-  HiLink nimRepeat		      Repeat
-  HiLink nimString		      String
-  HiLink nimRawString	    String
+  HiLink nimKeyword        Keyword
+  HiLink nimLibrary        Include
+  HiLink nimFunction       PreProc
+  HiLink nimFunctionName   Function
+  HiLink nimConditional    Conditional
+  HiLink nimRepeat         Repeat
+  HiLink nimString         String
+  HiLink nimRawString      String
   HiLink nimBoolean        Boolean
-  HiLink nimEscape		      Special
-  HiLink nimOperator		    Operator
-  HiLink nimPreCondit	    PreCondit
-  HiLink nimComment		    Comment
-  HiLink nimTodo		        Todo
-  HiLink nimDecorator	    Define
-  HiLink nimSpecialVar	    Identifier
+  HiLink nimEscape         Special
+  HiLink nimOperator       Operator
+  HiLink nimPreCondit      PreCondit
+  HiLink nimComment        Comment
+  HiLink nimTodo           Todo
+  HiLink nimDecorator      Define
+  HiLink nimSpecialVar     Identifier
   
   if nim_highlight_numbers == 1
-    HiLink nimNumber	Number
+    HiLink nimNumber Number
+  endif
+
+  if nim_highlight_some_types == 1
+    HiLink nimType Type
   endif
   
   if nim_highlight_builtins == 1
-    HiLink nimBuiltin	Number
+    HiLink nimBuiltin Keyword
   endif
   
   if nim_highlight_exceptions == 1
-    HiLink nimException	Exception
+    HiLink nimException Exception
   endif
   
   if nim_highlight_space_errors == 1
-    HiLink nimSpaceError	Error
+    HiLink nimSpaceError Error
   endif
 
   delcommand HiLink
